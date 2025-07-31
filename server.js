@@ -16,7 +16,7 @@ const SECRET_KEY = process.env.JWT_SECRET || "supersecretkey";
 const sequelize = require("./config/connection");
 const routes = require("./routes");
 
-// Initialize Express application
+// Initialize Express application MIddleware to parse JSON request bodies, essential for  POST and PUT
 const app = express();
 
 app.use(express.json());

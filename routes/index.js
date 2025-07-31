@@ -13,4 +13,5 @@ router.use("/api/categories", categoryRoutes);
 router.use("/api/posts", postRoutes);
 router.use("/api/users", userRoutes);
 
+
 module.exports = router;

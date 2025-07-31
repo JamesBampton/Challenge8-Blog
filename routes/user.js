@@ -73,10 +73,7 @@ router.put("/:id", async (req, res) => {
 router.post("/login", async (req, res) => {
 
   try {
-
-      console.log("Password from request:", req.body.password);
-      
-
+    console.log("Password from request:", req.body.password);
     const userData = await User.findOne({ where: { email: req.body.email } });
     if (!userData) {
 
@@ -87,7 +84,6 @@ router.post("/login", async (req, res) => {
     }
 
     const validPassword = await userData.checkPassword(req.body.password);
-
     console.log("Password match:", validPassword);
 
     if (!validPassword) {
@@ -104,6 +100,62 @@ router.post("/login", async (req, res) => {
     res.status(400).json(err);
   }
 });
+
+// Register a new user ORIGINAL Code
+/* router.post("/register", async (req, res) => {
+  try {
+    const userData = await User.create(req.body);
+
+    const token = signToken(userData);
+    res.status(201).json({
+      message: "User created successfully",
+      user: userData,
+      token,
+    });
+  } catch (err) {
+    console.error("Registration error:", err);
+    res.status(400).json({ message: "Failed to register user", error: err });
+  }
+}); */
+
+
+// Register a new user
+router.post("/register", async (req, res) => {
+
+  const { username, email, password } = req.body;
+
+  //Validate all fields are populated before before callinf User.create, if not all fields are populated fire a message box
+  if (!username || !email || !password) {
+    return res.status(400).json({ message: "All fields are required" });}
+
+  //Validate if email is correct format, if not report error messaage via message box
+  const emailRegex = /^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ message: "Invalid email format" });
+  }
+  
+  try {
+
+    const existingUser = await User.findOne({ where: { email: req.body.email } });
+     if (existingUser) {
+      res.status(409).json({ message: "User already exists with this email. Please try again",
+     });
+    }
+    const userData = await User.create(req.body);
+
+    const token = signToken(userData);
+    res.status(201).json({
+      message: "User registered successfully!",
+      user: userData,
+      token,
+    });
+  } catch (err) {
+    console.error("Registration error:", err);
+    res.status(400).json({ message: "Registration failed. Please try again.", error: err });
+  }
+});
+
+
 
 router.post("/logout", (req, res) => {
   res.status(204).end();
